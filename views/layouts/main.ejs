@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header>
+    <h1>My King Preorder Hub</h1>
+    <nav>
+      <a href="/">Home</a>
+      <% if (session && session.userId) { %>
+        <a href="/admin/orders">Admin</a>
+        <a href="/logout">Logout</a>
+      <% } else { %>
+        <a href="/login">Login</a>
+        <a href="/signup">Sign up</a>
+      <% } %>
+    </nav>
+    
+    <form action="/search" method="GET" style="display: inline-block; margin-left: 20px;">
+      <input type="text" name="q" placeholder="Search products..." required>
+      <button type="submit">Search</button>
+    </form>
+    
+  </header>
+
+  <main>
+    <%- body %>
+  </main>
+</body>
+</html>

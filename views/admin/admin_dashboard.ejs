@@ -1,0 +1,16 @@
+<h2>Admin Dashboard - Orders</h2>
+
+<table border="1" cellpadding="10">
+  <tr>
+    <th>User</th>
+    <th>Product</th>
+    <th>Ordered At</th>
+  </tr>
+  <% orders.forEach(order => { %>
+    <tr>
+      <td><%= order.userId.fullName %> (<%= order.userId.email %>)</td>
+      <td><%= order.productId.name %></td>
+      <td><%= order.createdAt.toDateString() %></td>
+    </tr>
+  <% }) %>
+</table>

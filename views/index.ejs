@@ -1,0 +1,17 @@
+<h2>Welcome to your My King Preorder Store</h2>
+<p>Browse products and preorder items that arrive in 90 days.</p>
+
+<div class="products-grid">
+  <% products.forEach(product => { %>
+    <div class="product-card">
+      <img src="<%= product.image %>" alt="<%= product.name %>">
+      <h3>
+        <a href="/product/<%= product._id %>"><%= product.name %></a>
+      </h3>
+      <p><%= product.description %></p>
+      <p><strong>$<%= product.price %></strong></p>
+      <p>Preorder by: <%= product.preorderDeadline.toDateString() %></p>
+      <button>Order Now</button>
+    </div>
+  <% }) %>
+</div>

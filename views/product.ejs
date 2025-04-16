@@ -1,0 +1,17 @@
+
+<h2><%= product.name %></h2>
+<img src="<%= product.image %>" alt="<%= product.name %>" style="width: 300px;">
+<p><strong>Description:</strong> <%= product.description %></p>
+<p><strong>Category:</strong> <%= product.category %></p>
+<p><strong>Price:</strong> $<%= product.price %></p>
+<p><strong>Preorder Deadline:</strong> <%= product.preorderDeadline.toDateString() %></p>
+
+<% if (session.userId) { %>
+  <form action="/preorder/<%= product._id %>" method="POST">
+    <button type="submit">Order Now</button>
+  </form>
+<% } else { %>
+  <p><a href="/login">Login to preorder</a></p>
+<% } %>
+
+<a href="/">← Back to Products</a>
