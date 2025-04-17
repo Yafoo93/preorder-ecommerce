@@ -7,19 +7,18 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const expressLayouts = require('express-ejs-layouts');
 
-
 const app = express();
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI)
-.then(() => console.log('MongoDB connected'))
+  .then(() => console.log('MongoDB connected'))
   .catch(err => console.error(err));
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'ejs');
-app.use(expressLayouts); // Use layouts
+app.use(expressLayouts);
 app.set('layout', 'layouts/main');
 
 // Session setup
@@ -30,34 +29,40 @@ app.use(session({
   store: MongoStore.create({ mongoUrl: process.env.MONGO_URI }),
 }));
 
-app.use((req, res, next) => {
-    res.locals.session = req.session;
-    next();
-  });
-  
+// Global session access + cart/wishlist count
+app.use(async (req, res, next) => {
+  res.locals.session = req.session;
+
+  if (req.session.userId) {
+    const User = require('./models/User');
+    const user = await User.findById(req.session.userId);
+    req.session.cartCount = user.cart.length;
+    req.session.wishlistCount = user.wishlist.length;
+    res.locals.session.cartCount = user.cart.length;
+    res.locals.session.wishlistCount = user.wishlist.length;
+  } else {
+    req.session.cartCount = 0;
+    req.session.wishlistCount = 0;
+  }
+
+  next();
+});
 
 // Routes
-app.use('/', require('./routes/index')); //home page
-app.use('/', require('./routes/users')); //user
-app.use('/', require('./routes/admin')); //admin
-
-
-app.use((req, res, next) => {
-    res.locals.session = req.session;
-    next();
-  });  
-
+app.use('/', require('./routes/index'));
+app.use('/', require('./routes/users'));
+app.use('/', require('./routes/admin'));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
 
-
+// Seed Products
 const Product = require('./models/product');
 
 async function seedProducts() {
   // Clear existing products
   await Product.deleteMany({});
-  
+
   await Product.insertMany([
     {
       name: 'Smart Watch',
@@ -69,25 +74,68 @@ async function seedProducts() {
     {
       name: 'Modern Sofa',
       description: 'Stylish and comfy',
-      category: 'furniture',
+      category: 'furnitures',
       price: 499,
       image: '/images/sofa1.jpeg',
     },
     {
-      name: 'iPhone Apple',
+      name: 'iPhone 14 Pro',
       description: 'Latest Apple device preorder',
-      category: 'electronics',
+      category: 'mobile phones',
+      price: 999,
+      image: '/images/apple1.jpeg',
+    },
+    {
+      name: 'Apple Watch Series 7',
+      description: 'Latest Apple Watch preorder',
+      category: 'mobile phones',
       price: 999,
       image: '/images/apple.jpeg',
     },
     {
       name: 'Luxury Sofa',
       description: 'Comfortable and stylish seating',
-      category: 'furniture',
+      category: 'furnitures',
       price: 799,
       image: '/images/sofa2.jpeg',
     },
+    {
+      name: 'PlayStation 5',
+      description: 'Next-gen gaming console',
+      category: 'toys and games',
+      price: 599,
+      image: '/images/ps5.jpeg',
+    },
+    {
+      name: 'Running Shoes',
+      description: 'Perfect for sports and fitness',
+      category: 'sports',
+      price: 89,
+      image: '/images/shoes.jpeg',
+    },
+    {
+      name: 'Lipstick Set',
+      description: 'Vibrant shades for every occasion',
+      category: 'beauty and fashion',
+      price: 29,
+      image: '/images/lipstick.jpeg',
+    },
+    {
+      name: 'Kids Puzzle',
+      description: 'Educational and fun',
+      category: 'kids corner',
+      price: 19,
+      image: '/images/puzzle.jpeg',
+    },
+    {
+      name: 'Microwave Oven',
+      description: 'Convenient kitchen appliance',
+      category: 'home appliance',
+      price: 150,
+      image: '/images/microwave.jpeg',
+    }
   ]);
+
   console.log('Sample products added');
 }
 

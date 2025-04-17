@@ -1,0 +1,10 @@
+<h2>Your Wishlist</h2>
+<% if (products.length === 0) { %>
+  <p>Your wishlist is empty.</p>
+<% } else { %>
+  <ul>
+    <% products.forEach(p => { %>
+      <li><strong><%= p.name %></strong> - $<%= p.price %></li>
+    <% }) %>
+  </ul>
+<% } %>

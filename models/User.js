@@ -5,8 +5,11 @@ const userSchema = new mongoose.Schema({
   fullName: { type: String, required: true },
   email: { type: String, unique: true, required: true },
   password: { type: String, required: true },
+  cart: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
+  wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
   createdAt: { type: Date, default: Date.now }
 });
+
 
 // Password hashing
 userSchema.pre('save', async function (next) {
@@ -19,5 +22,7 @@ userSchema.pre('save', async function (next) {
 userSchema.methods.comparePassword = function (candidatePassword) {
   return bcrypt.compare(candidatePassword, this.password);
 };
+
+
 
 module.exports = mongoose.model('User', userSchema);

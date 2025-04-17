@@ -48,6 +48,32 @@ router.get('/search', async (req, res) => {
       products
     });
   });
+ 
+  //Drop down menu for categories
+router.get('/category/:cat', async (req, res) => {
+    const category = req.params.cat.toLowerCase();
+    const products = await Product.find({
+      category: { $regex: new RegExp(`^${category}$`, 'i') }
+    });
+  
+    res.render('index', {
+      title: `Category: ${category}`,
+      products
+    });
+  });
+
+router.get('/about', (req, res) => {
+    res.render('about', { title: 'About Us' });
+  });
+  
+router.get('/locate', (req, res) => {
+    res.render('locate', { title: 'Locate Us' });
+  });
+  
+router.get('/contact', (req, res) => {
+    res.render('contact', { title: 'Contact Us' });
+  });
+  
   
 
 

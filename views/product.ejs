@@ -1,4 +1,3 @@
-
 <h2><%= product.name %></h2>
 <img src="<%= product.image %>" alt="<%= product.name %>" style="width: 300px;">
 <p><strong>Description:</strong> <%= product.description %></p>
@@ -10,8 +9,16 @@
   <form action="/preorder/<%= product._id %>" method="POST">
     <button type="submit">Order Now</button>
   </form>
+
+  <form action="/cart/<%= product._id %>" method="POST" style="display: inline;">
+    <button type="submit" title="Add to Cart">Add to cart🛒</button>
+  </form>
+
+  <form action="/wishlist/<%= product._id %>" method="POST" style="display: inline;">
+    <button type="submit" title="Add to Wishlist">Add to Wishlist⭐</button>
+  </form>
 <% } else { %>
-  <p><a href="/login">Login to preorder</a></p>
+  <p><a href="/login">Login to preorder or add to cart/wishlist</a></p>
 <% } %>
 
 <a href="/">← Back to Products</a>
