@@ -6,17 +6,8 @@
 <p><strong>Preorder Deadline:</strong> <%= product.preorderDeadline.toDateString() %></p>
 
 <% if (session.userId) { %>
-  <form action="/preorder/<%= product._id %>" method="POST">
-    <button type="submit">Order Now</button>
-  </form>
-
-  <form action="/cart/<%= product._id %>" method="POST" style="display: inline;">
-    <button type="submit" title="Add to Cart">Add to cart🛒</button>
-  </form>
-
-  <form action="/wishlist/<%= product._id %>" method="POST" style="display: inline;">
-    <button type="submit" title="Add to Wishlist">Add to Wishlist⭐</button>
-  </form>
+  <button onclick="addToCart('<%= product._id %>')">Order Now 🛒</button>
+  <button onclick="addToWishlist('<%= product._id %>')">⭐</button>
 <% } else { %>
   <p><a href="/login">Login to preorder or add to cart/wishlist</a></p>
 <% } %>

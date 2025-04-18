@@ -8,8 +8,8 @@
   </tr>
   <% orders.forEach(order => { %>
     <tr>
-      <td><%= order.userId.fullName %> (<%= order.userId.email %>)</td>
-      <td><%= order.productId.name %></td>
+      <td><%= order.user.fullName %> (<%= order.user.email %>)</td>
+      <td><%= order.product ? order.product.name : 'No Product Info' %></td>
       <td><%= order.createdAt.toDateString() %></td>
     </tr>
   <% }) %>

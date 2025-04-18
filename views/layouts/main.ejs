@@ -52,5 +52,30 @@
   <main>
     <%- body %>
   </main>
+
+  <script>
+    async function addToCart(productId) {
+      const res = await fetch(`/api/cart/${productId}`, {
+        method: 'POST'
+      });
+  
+      if (res.ok) {
+        const data = await res.json();
+        document.getElementById('cartCount').innerText = data.cartCount;
+      }
+    }
+  
+    async function addToWishlist(productId) {
+      const res = await fetch(`/api/wishlist/${productId}`, {
+        method: 'POST'
+      });
+  
+      if (res.ok) {
+        const data = await res.json();
+        document.getElementById('wishlistCount').innerText = data.wishlistCount;
+      }
+    }
+  </script>
+
 </body>
 </html>

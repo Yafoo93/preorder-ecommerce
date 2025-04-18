@@ -6,8 +6,9 @@ const MongoStore = require('connect-mongo');
 const bodyParser = require('body-parser');
 const path = require('path');
 const expressLayouts = require('express-ejs-layouts');
-
+const multer = require('multer');
 const app = express();
+const Product = require('./models/product');
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI)
@@ -56,12 +57,24 @@ app.use('/', require('./routes/admin'));
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
 
-// Seed Products
-const Product = require('./models/product');
+
+// Set storage engine
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/'); // Ensure this directory exists
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+// Initialize upload
+const upload = multer({ storage: storage });
+
+// Seed products
 
 async function seedProducts() {
-  // Clear existing products
-  await Product.deleteMany({});
 
   await Product.insertMany([
     {

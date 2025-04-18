@@ -1,0 +1,20 @@
+<h2>Checkout</h2>
+<p>Total: $<%= total %></p>
+
+<form id="paymentForm" action="/checkout" method="POST" enctype="multipart/form-data">
+  <label for="paymentProof">Upload Payment Proof:</label>
+  <input type="file" id="paymentProof" name="paymentProof" accept="image/*,application/pdf" required>
+  <br><br>
+  <button type="submit" id="paidButton" disabled>Paid</button>
+</form>
+
+<p id="confirmationMessage"></p>
+
+<script>
+  const paymentProofInput = document.getElementById('paymentProof');
+  const paidButton = document.getElementById('paidButton');
+
+  paymentProofInput.addEventListener('change', () => {
+    paidButton.disabled = !paymentProofInput.files.length;
+  });
+</script>

@@ -4,7 +4,12 @@
 <% } else { %>
   <ul>
     <% products.forEach(p => { %>
-      <li><strong><%= p.name %></strong> - $<%= p.price %></li>
+      <li>
+        <strong><%= p.name %></strong> - $<%= p.price %>
+        <form action="/wishlist/remove/<%= p._id %>" method="POST" style="display:inline;">
+          <button type="submit" title="Remove">❌</button>
+        </form>
+      </li>
     <% }) %>
   </ul>
 <% } %>

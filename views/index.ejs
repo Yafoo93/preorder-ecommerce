@@ -5,13 +5,18 @@
   <% products.forEach(product => { %>
     <div class="product-card">
       <img src="<%= product.image %>" alt="<%= product.name %>">
-      <h3>
-        <a href="/product/<%= product._id %>"><%= product.name %></a>
-      </h3>
+      <h3><a href="/product/<%= product._id %>"><%= product.name %></a></h3>
       <p><%= product.description %></p>
       <p><strong>$<%= product.price %></strong></p>
       <p>Preorder by: <%= product.preorderDeadline.toDateString() %></p>
-      <button>Order Now</button>
+
+      <% if (session.userId) { %>
+        <button onclick="addToCart('<%= product._id %>')">Order Now 🛒</button>
+        <button onclick="addToWishlist('<%= product._id %>')">⭐</button>
+      <% } else { %>
+        <p><a href="/login">Login to order or wishlist</a></p>
+      <% } %>
     </div>
   <% }) %>
 </div>
+

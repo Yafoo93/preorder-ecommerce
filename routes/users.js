@@ -2,6 +2,9 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
 const Product = require('../models/product');
+const upload = require('../middleware/upload');
+const Order = require('../models/order');
+
 
 // Signup form
 router.get('/signup', (req, res) => {
@@ -110,6 +113,63 @@ router.post('/api/wishlist/:id', async (req, res) => {
 
   req.session.wishlistCount = user.wishlist.length;
   res.json({ wishlistCount: user.wishlist.length });
+});
+
+// Remove from cart
+router.post('/cart/remove/:id', async (req, res) => {
+  const user = await User.findById(req.session.userId);
+  user.cart = user.cart.filter(item => item.toString() !== req.params.id);
+  await user.save();
+  req.session.cartCount = user.cart.length;
+  res.redirect('/cart');
+});
+
+// Remove from wishlist
+router.post('/wishlist/remove/:id', async (req, res) => {
+  const user = await User.findById(req.session.userId);
+  user.wishlist = user.wishlist.filter(item => item.toString() !== req.params.id);
+  await user.save();
+  req.session.wishlistCount = user.wishlist.length;
+  res.redirect('/wishlist');
+});
+
+//checkout route
+
+router.get('/checkout', async (req, res) => {
+  if (!req.session.userId) return res.redirect('/login');
+
+  const user = await User.findById(req.session.userId).populate('cart');
+  const total = user.cart.reduce((sum, item) => sum + item.price, 0);
+
+  res.render('checkout', {
+    title: 'Checkout',
+    total
+  });
+});
+
+
+router.post('/checkout', upload.single('paymentProof'), async (req, res) => {
+  try {
+    const { file } = req;
+    const userId = req.session.userId;
+
+    if (!file) {
+      return res.status(400).send('No file uploaded.');
+    }
+
+    const newOrder = new Order({
+      user: userId,
+      paymentProof: file.filename,
+      status: 'Pending Confirmation'
+    });
+
+    await newOrder.save();
+
+    res.send('Payment made, awaiting confirmation.');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Server Error');
+  }
 });
 
 module.exports = router;
