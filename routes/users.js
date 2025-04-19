@@ -150,20 +150,38 @@ router.get('/checkout', async (req, res) => {
 
 router.post('/checkout', upload.single('paymentProof'), async (req, res) => {
   try {
-    const { file } = req;
     const userId = req.session.userId;
+    const user = await User.findById(userId).populate('cart');
 
-    if (!file) {
-      return res.status(400).send('No file uploaded.');
+    if (!user.cart.length) {
+      return res.status(400).send('Your cart is empty.');
     }
+
+    const products = user.cart.map(item => ({
+      product: item._id,
+      quantity: 1, // Adjust if quantity is tracked
+      price: item.price,
+    }));
+
+    const totalAmount = products.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
     const newOrder = new Order({
       user: userId,
-      paymentProof: file.filename,
-      status: 'Pending Confirmation'
+      products,
+      totalAmount,
+      paymentProof: req.file.filename,
+      estimatedDeliveryDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // Example: 14 days from now
     });
 
     await newOrder.save();
+
+    // Clear user's cart
+    user.cart = [];
+    await user.save();
+
+    // Reset session cart count
+    req.session.cartCount = 0;
+    res.locals.session.cartCount = 0;
 
     res.send('Payment made, awaiting confirmation.');
   } catch (error) {
@@ -171,5 +189,6 @@ router.post('/checkout', upload.single('paymentProof'), async (req, res) => {
     res.status(500).send('Server Error');
   }
 });
+
 
 module.exports = router;

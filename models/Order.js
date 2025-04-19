@@ -2,11 +2,18 @@ const mongoose = require('mongoose');
 
 const orderSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
+  products: [
+    {
+      product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
+      quantity: Number,
+      price: Number,
+    },
+  ],
+  totalAmount: Number,
   paymentProof: String,
-  status: { type: String, enum: ['Pending Confirmation', 'Confirmed'], default: 'Pending Confirmation' },
-  createdAt: { type: Date, default: Date.now }
-});
+  status: { type: String, default: 'Awaiting Confirmation' },
+  estimatedDeliveryDate: Date,
+}, { timestamps: true });
 
 
 module.exports = mongoose.models.Order || mongoose.model('Order', orderSchema);

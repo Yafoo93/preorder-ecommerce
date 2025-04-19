@@ -11,14 +11,36 @@ router.get('/admin/orders', async (req, res) => {
 });
 
 //Admin payment confirmation
-router.get('/admin/orders', async (req, res) => {
-  const orders = await Order.find().populate('user');
-  res.render('admin/adminOrders', { title: 'Admin Orders', orders });
+router.get('/orders', async (req, res) => {
+  try {
+    const orders = await Order.find()
+      .populate('user')
+      .populate('products.product') // ✅ Correct nested populate
+      .sort({ createdAt: -1 });
+
+    res.render('admin/adminOrders', {
+      title: 'Admin Orders',
+      orders
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Failed to load orders');
+  }
 });
 
-router.post('/admin/orders/:id/confirm', async (req, res) => {
-  await Order.findByIdAndUpdate(req.params.id, { status: 'Confirmed' });
-  res.redirect('/admin/orders');
+
+router.post('/orders/:id/confirm', async (req, res) => {
+  try {
+    const orderId = req.params.id;
+    await Order.findByIdAndUpdate(orderId, {
+      status: 'Order Confirmed',
+      estimatedDeliveryDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
+    });
+    res.redirect('/admin/orders');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Server Error');
+  }
 });
 
 

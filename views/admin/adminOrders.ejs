@@ -7,12 +7,32 @@
     <div style="border: 1px solid #ccc; padding: 10px; margin-bottom: 10px;">
       <p><strong>User:</strong> <%= order.user.fullName %> (<%= order.user.email %>)</p>
       <p><strong>Status:</strong> <%= order.status %></p>
-      <p><strong>Payment Proof:</strong> <a href="/uploads/<%= order.paymentProof %>" target="_blank">View</a></p>
 
-      <% if (order.status === 'Pending Confirmation') { %>
+      <p><strong>Products Ordered:</strong></p>
+      <ul>
+        <% order.products.forEach(item => { %>
+          <li>
+            <%= item.product.name %> - Quantity: <%= item.quantity %> - Price: $<%= item.price %>
+          </li>
+        <% }) %>
+      </ul>
+
+      <p><strong>Total Amount:</strong> $<%= order.totalAmount %></p>
+
+      <p><strong>Payment Proof:</strong>
+        <% if (order.paymentProof) { %>
+          <a href="/uploads/<%= order.paymentProof %>" target="_blank">View</a>
+        <% } else { %>
+          Not uploaded
+        <% } %>
+      </p>
+
+      <% if (order.status === 'Awaiting Confirmation') { %>
         <form action="/admin/orders/<%= order._id %>/confirm" method="POST">
           <button type="submit">Mark as Paid</button>
         </form>
+      <% } else { %>
+        <p style="color: green;"><strong>Confirmed:</strong> Your product will reach Ghana by <%= new Date(order.estimatedDeliveryDate).toDateString() %></p>
       <% } %>
     </div>
   <% }) %>

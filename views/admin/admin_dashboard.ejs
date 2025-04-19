@@ -1,16 +1,47 @@
 <h2>Admin Dashboard - Orders</h2>
 
-<table border="1" cellpadding="10">
-  <tr>
-    <th>User</th>
-    <th>Product</th>
-    <th>Ordered At</th>
-  </tr>
-  <% orders.forEach(order => { %>
+<table>
+  <thead>
     <tr>
-      <td><%= order.user.fullName %> (<%= order.user.email %>)</td>
-      <td><%= order.product ? order.product.name : 'No Product Info' %></td>
-      <td><%= order.createdAt.toDateString() %></td>
+      <th>User</th>
+      <th>Products</th>
+      <th>Total Amount</th>
+      <th>Status</th>
+      <th>Payment Proof</th>
+      <th>Actions</th>
     </tr>
-  <% }) %>
+  </thead>
+  <tbody>
+    <% orders.forEach(order => { %>
+      <tr>
+        <td><%= order.user.fullName %> (<%= order.user.email %>)</td>
+        <td>
+          <ul>
+            <% order.products.forEach(item => { %>
+              <li><%= item.product.name %> - Quantity: <%= item.quantity %> - Price: $<%= item.price %></li>
+            <% }) %>
+          </ul>
+        </td>
+        <td>$<%= order.totalAmount %></td>
+        <td><%= order.status %></td>
+        <td>
+          <% if (order.paymentProof) { %>
+            <a href="/uploads/<%= order.paymentProof %>" target="_blank">View Proof</a>
+          <% } else { %>
+            No proof uploaded
+          <% } %>
+        </td>
+        <td>
+          <% if (order.status === 'Awaiting Confirmation') { %>
+            <form action="/admin/orders/<%= order._id %>/confirm" method="POST">
+              <button type="submit">Confirm Payment</button>
+            </form>
+          <% } else { %>
+            Payment Confirmed
+          <% } %>
+        </td>
+      </tr>
+    <% }) %>
+  </tbody>
 </table>
+
