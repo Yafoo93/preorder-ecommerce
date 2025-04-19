@@ -9,23 +9,24 @@
   <header>
     <h1>My King Preorder Hub</h1>
     <nav>
-      <nav>
-        <a href="/">Home</a>
-        <a href="/about">About Us</a>
-        <a href="/locate">Locate Us</a>
-        <a href="/contact">Contact Us</a>
-        <% if (session && session.userId) { %>
+      <a href="/">Home</a>
+      <a href="/about">About Us</a>
+      <a href="/locate">Locate Us</a>
+      <a href="/contact">Contact Us</a>
+    
+      <% if (session && session.userId) { %>
+        <% if (session.isAdmin) { %>
           <a href="/admin/orders">Admin</a>
-          <a href="/logout">Logout</a>
-          <a href="/cart" title="Cart">🛒(<span id="cartCount"><%= session.cartCount || 0 %></span>)</a>
-          <a href="/wishlist" title="Wishlist">⭐(<span id="wishlistCount"><%= session.wishlistCount || 0 %></span>)</a>
-        <% } else { %>
-          <a href="/login">Login</a>
-          <a href="/signup">Sign up</a>
         <% } %>
-      </nav>
-      
-      
+        <a href="/cart" title="Cart">🛒(<span id="cartCount"><%= session.cartCount || 0 %></span>)</a>
+        <a href="/wishlist" title="Wishlist">⭐(<span id="wishlistCount"><%= session.wishlistCount || 0 %></span>)</a>
+        <a href="/profile" title="Profile">
+          <img src="/images/profile-icon1.png" alt="Profile" style="width: 24px; height: 24px; vertical-align: middle;" />
+        </a>
+      <% } else { %>
+        <a href="/login">Login</a>
+        <a href="/signup">Sign up</a>
+      <% } %>
     </nav>
     
     <form action="/search" method="GET" style="display: inline-block; margin-left: 20px;">

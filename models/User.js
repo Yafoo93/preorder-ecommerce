@@ -5,9 +5,16 @@ const userSchema = new mongoose.Schema({
   fullName: { type: String, required: true },
   email: { type: String, unique: true, required: true },
   password: { type: String, required: true },
+  phoneNumber: { type: String },
+  address: { type: String },
   cart: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
   wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
-  createdAt: { type: Date, default: Date.now }
+  createdAt: { type: Date, default: Date.now },
+  isAdmin: {
+    type: Boolean,
+    default: false
+  }
+  
 });
 
 // Hash password before saving

@@ -6,6 +6,7 @@ const upload = require('../middleware/upload');
 const Order = require('../models/order');
 
 
+
 // Signup form
 router.get('/signup', (req, res) => {
   res.render('signup', { title: 'Signup' });
@@ -45,7 +46,14 @@ router.get('/logout', (req, res) => {
     req.session.destroy(() => {
       res.redirect('/');
     });
-  });  
+});  
+
+router.post('/logout', (req, res) => {
+    req.session.destroy(() => {
+      res.redirect('/');
+    });
+});
+  
 
   // Add to cart
 router.post('/cart/:id', async (req, res) => {
@@ -159,7 +167,7 @@ router.post('/checkout', upload.single('paymentProof'), async (req, res) => {
 
     const products = user.cart.map(item => ({
       product: item._id,
-      quantity: 1, // Adjust if quantity is tracked
+      quantity: 1, 
       price: item.price,
     }));
 
@@ -170,7 +178,7 @@ router.post('/checkout', upload.single('paymentProof'), async (req, res) => {
       products,
       totalAmount,
       paymentProof: req.file.filename,
-      estimatedDeliveryDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // Example: 14 days from now
+      estimatedDeliveryDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), 
     });
 
     await newOrder.save();
@@ -189,6 +197,73 @@ router.post('/checkout', upload.single('paymentProof'), async (req, res) => {
     res.status(500).send('Server Error');
   }
 });
+
+//User profile
+router.get('/profile', async (req, res) => {
+  if (!req.session.userId) return res.redirect('/login');
+
+  const user = await User.findById(req.session.userId)
+    .populate('cart')
+    .populate('wishlist');
+
+  const orders = await Order.find({ user: user._id })
+    .populate('products.product')
+    .sort({ createdAt: -1 });
+
+  res.render('users/profile', {
+    title: 'Your Profile',
+    user,
+    orders,
+    cart: user.cart,
+    wishlist: user.wishlist
+  });
+});
+
+// Edit profile form
+router.get('/profile/edit', async (req, res) => {
+  if (!req.session.userId) return res.redirect('/login');
+
+  const user = await User.findById(req.session.userId);
+  res.render('users/edit-profile', { title: 'Edit Profile', user });
+});
+
+// Update profile
+router.post('/profile/edit', async (req, res) => {
+  if (!req.session.userId) return res.redirect('/login');
+
+  try {
+    const user = await User.findById(req.session.userId);
+    const { fullName, email, phoneNumber, address, currentPassword, newPassword, confirmPassword } = req.body;
+
+    // Update basic info
+    user.fullName = fullName;
+    user.email = email;
+    user.phoneNumber = phoneNumber;
+    user.address = address;
+
+    // Handle password change if provided
+    if (currentPassword && newPassword) {
+      if (newPassword !== confirmPassword) {
+        return res.send('New passwords do not match');
+      }
+
+      const isMatch = await user.comparePassword(currentPassword);
+      if (!isMatch) {
+        return res.send('Current password is incorrect');
+      }
+
+      user.password = newPassword;
+    }
+
+    await user.save();
+    res.redirect('/profile');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error updating profile');
+  }
+});
+
+
 
 
 module.exports = router;

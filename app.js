@@ -10,6 +10,7 @@ const multer = require('multer');
 const app = express();
 const Product = require('./models/product');
 
+
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('MongoDB connected'))
@@ -38,10 +39,23 @@ app.use(async (req, res, next) => {
   if (req.session.userId) {
     const User = require('./models/User');
     const user = await User.findById(req.session.userId);
-    req.session.cartCount = user.cart.length;
-    req.session.wishlistCount = user.wishlist.length;
-    res.locals.session.cartCount = user.cart.length;
-    res.locals.session.wishlistCount = user.wishlist.length;
+
+    if (user) {
+      req.session.cartCount = user.cart.length;
+      req.session.wishlistCount = user.wishlist.length;
+      req.session.isAdmin = user.isAdmin;
+
+      res.locals.session.cartCount = user.cart.length;
+      res.locals.session.wishlistCount = user.wishlist.length;
+      res.locals.session.isAdmin = user.isAdmin;
+    } else {
+      // If user doesn't exist anymore, clear the session
+      console.log('User session found, but user no longer exists. Clearing session...');
+      req.session.destroy(() => {
+        res.redirect('/login');
+      });
+      return;
+    }
   } else {
     req.session.cartCount = 0;
     req.session.wishlistCount = 0;
@@ -49,6 +63,7 @@ app.use(async (req, res, next) => {
 
   next();
 });
+
 
 // Routes
 app.use('/', require('./routes/index'));
@@ -75,10 +90,11 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 // Seed products
-
+// This function seeds the database with sample products if the collection is empty
 async function seedProducts() {
-
-  await Product.insertMany([
+  const count = await Product.countDocuments();
+  if (count === 0) {
+    await Product.insertMany([
     {
       name: 'Smart Watch',
       description: 'Waterproof and fitness-friendly',
@@ -150,8 +166,10 @@ async function seedProducts() {
       image: '/images/microwave.jpeg',
     }
   ]);
-
   console.log('Sample products added');
+} else {
+  console.log('Products already exist, skipping seeding.');
+}
 }
 
 seedProducts();

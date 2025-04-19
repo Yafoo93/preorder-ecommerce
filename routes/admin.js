@@ -1,8 +1,23 @@
+const ensureAdmin = require('../middleware/admin');
 const express = require('express');
 const router = express.Router();
 const Order = require('../models/order');
 const Product = require('../models/product');
 const User = require('../models/User');
+const { ensureAdmin } = require('../middleware/auth');
+
+
+
+router.get('/orders', ensureAdmin, async (req, res) => {
+  const orders = await Order.find()
+    .populate('user')
+    .populate('products.product')
+    .sort({ createdAt: -1 });
+
+  res.render('admin/adminOrders', { title: 'Admin Orders', orders });
+});
+
+
 
 //Admin Order Management
 router.get('/admin/orders', async (req, res) => {

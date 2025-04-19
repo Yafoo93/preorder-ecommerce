@@ -1,0 +1,71 @@
+<h2>Your Profile</h2>
+
+<p><strong>Full Name:</strong> <%= user.fullName %></p>
+<p><strong>Email:</strong> <%= user.email %></p>
+<p><strong>Phone Number:</strong> <%= user.phoneNumber || 'Not provided' %></p>
+<p><strong>Address:</strong> <%= user.address || 'Not provided' %></p>
+
+<a href="/profile/edit" style="display: inline-block; margin-right: 10px;">
+  <button>Edit Profile</button>
+</a>
+
+<form action="/logout" method="POST" style="display: inline-block;">
+  <button type="submit">Logout</button>
+</form>
+
+<hr>
+
+<h3>Active Orders</h3>
+<% orders.filter(o => o.status !== 'Delivered').forEach(order => { %>
+  <div style="border: 1px solid #ccc; padding: 10px;">
+    <p><strong>Status:</strong> <%= order.status %></p>
+    <p><strong>Estimated Delivery:</strong> <%= order.estimatedDeliveryDate?.toDateString() || 'N/A' %></p>
+    <ul>
+      <% order.products.forEach(item => { %>
+        <% if (item.product) { %>
+          <li><%= item.product.name %> x <%= item.quantity %> - $<%= item.price %></li>
+        <% } else { %>
+          <li><em>Product not found (deleted)</em></li>
+        <% } %>
+      <% }) %>
+    </ul>
+  </div>
+<% }) %>
+
+<h3>Order History</h3>
+<% orders.filter(o => o.status === 'Delivered').forEach(order => { %>
+  <div style="border: 1px solid #eee; padding: 10px;">
+    <p><strong>Delivered On:</strong> <%= order.estimatedDeliveryDate?.toDateString() || 'N/A' %></p>
+    <ul>
+        <% order.products.forEach(item => { %>
+          <% if (item.product) { %>
+            <li><%= item.product.name %> x <%= item.quantity %> - $<%= item.price %></li>
+          <% } else { %>
+            <li><em>Product not found (deleted)</em></li>
+          <% } %>
+        <% }) %>
+      </ul>          
+  </div>
+<% }) %>
+
+<h3>Your Cart</h3>
+<% if (cart.length === 0) { %>
+  <p>Your cart is empty.</p>
+<% } else { %>
+  <ul>
+    <% cart.forEach(item => { %>
+      <li><%= item.name %> - $<%= item.price %></li>
+    <% }) %>
+  </ul>
+<% } %>
+
+<h3>Your Wishlist</h3>
+<% if (wishlist.length === 0) { %>
+  <p>Your wishlist is empty.</p>
+<% } else { %>
+  <ul>
+    <% wishlist.forEach(item => { %>
+      <li><%= item.name %> - $<%= item.price %></li>
+    <% }) %>
+  </ul>
+<% } %>
