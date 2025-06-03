@@ -3,6 +3,7 @@ const router = express.Router();
 const Product = require('../models/product');
 const ensureAuth = require('../middleware/auth');
 const Order = require('../models/order');
+const { sendOrderConfirmation } = require('../utils/mailer');
 
 router.get('/', async (req, res) => {
   const products = await Product.find().sort({ createdAt: -1 });
@@ -76,5 +77,15 @@ router.get('/contact', (req, res) => {
   
   
 
+  router.get('/test-email', async (req, res) => {
+    try {
+      await sendOrderConfirmation('yafoo93@gmail.com', 'TEST123'); // Replace with your actual email for testing
+      res.send('Test email sent successfully!');
+    } catch (err) {
+      console.error('Email error:', err);
+      res.status(500).send('Failed to send email.');
+    }
+  });
+  
 
 module.exports = router;

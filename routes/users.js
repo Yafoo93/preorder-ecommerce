@@ -4,6 +4,9 @@ const User = require('../models/User');
 const Product = require('../models/product');
 const upload = require('../middleware/upload');
 const Order = require('../models/order');
+const { sendWelcomeEmail } = require('../utils/mailer');
+const { sendPaymentReceivedEmail } = require('../utils/mailer');
+
 
 
 
@@ -18,12 +21,17 @@ router.post('/signup', async (req, res) => {
   try {
     const user = new User({ fullName, email, password });
     await user.save();
+
+    // 🔔 Send welcome email
+    await sendWelcomeEmail(email, fullName);
+
     req.session.userId = user._id;
     res.redirect('/');
   } catch (err) {
     res.send('Signup failed: ' + err.message);
   }
 });
+
 
 // Login form
 router.get('/login', (req, res) => {
@@ -182,6 +190,8 @@ router.post('/checkout', upload.single('paymentProof'), async (req, res) => {
     });
 
     await newOrder.save();
+    await sendPaymentReceivedEmail(user.email, newOrder._id);
+
 
     // Clear user's cart
     user.cart = [];

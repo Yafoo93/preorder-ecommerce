@@ -9,6 +9,9 @@ const expressLayouts = require('express-ejs-layouts');
 const multer = require('multer');
 const app = express();
 const Product = require('./models/product');
+const adminRoutes = require('./routes/admin');
+
+
 
 
 // Connect to MongoDB
@@ -65,10 +68,17 @@ app.use(async (req, res, next) => {
 });
 
 
+app.use((req, res, next) => {
+  res.locals.title = 'My Preorder Store'; // default title
+  next();
+});
+
+
 // Routes
 app.use('/', require('./routes/index'));
 app.use('/', require('./routes/users'));
 app.use('/admin', require('./routes/admin'));
+app.use('/admin', adminRoutes);
 
 
 const PORT = process.env.PORT || 3000;

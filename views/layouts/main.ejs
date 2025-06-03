@@ -8,6 +8,7 @@
 <body>
   <header>
     <h1>My King Preorder Hub</h1>
+    
     <nav>
       <a href="/">Home</a>
       <a href="/about">About Us</a>
@@ -16,7 +17,7 @@
     
       <% if (session && session.userId) { %>
         <% if (session.isAdmin) { %>
-          <a href="/admin/orders">Admin</a>
+          <a href="/admin/products">Admin</a>
         <% } %>
         <a href="/cart" title="Cart">🛒(<span id="cartCount"><%= session.cartCount || 0 %></span>)</a>
         <a href="/wishlist" title="Wishlist">⭐(<span id="wishlistCount"><%= session.wishlistCount || 0 %></span>)</a>
@@ -28,6 +29,7 @@
         <a href="/signup">Sign up</a>
       <% } %>
     </nav>
+    
     
     <form action="/search" method="GET" style="display: inline-block; margin-left: 20px;">
       <input type="text" name="q" placeholder="Search products..." required>

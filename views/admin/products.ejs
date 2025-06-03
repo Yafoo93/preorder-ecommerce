@@ -1,0 +1,29 @@
+<h2>All Products</h2>
+
+<a href="/admin/products/new">➕ Add New Product</a>
+
+<table border="1" cellspacing="0" cellpadding="8">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Category</th>
+      <th>Price</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% products.forEach(product => { %>
+      <tr>
+        <td><%= product.name %></td>
+        <td><%= product.category %></td>
+        <td>$<%= product.price %></td>
+        <td>
+          <a href="/admin/products/<%= product._id %>/edit">✏️ Edit</a>
+          <form action="/admin/products/<%= product._id %>/delete" method="POST" style="display:inline;">
+            <button type="submit" onclick="return confirm('Are you sure?')">🗑️ Delete</button>
+          </form>
+        </td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table>
